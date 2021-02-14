@@ -5,15 +5,15 @@ X = np.array([[0, 1], [1, 0]])
 Y = np.array([[0, -1j], [1j, 0]])
 Z = np.array([[1, 0], [0, -1]])
 H = 1/np.sqrt(2)*np.array([[1, 1], [1, -1]])
+CX = np.array([[1,0,0,0], [0,1,0,0], [0,0,0,1], [0,0,1,0]])
+CNOT = np.array([[1,0,0,0], [0,1,0,0], [0,0,0,1], [0,0,1,0]])
 zero = np.array([[1],[0]])
 one = np.array([[0],[1]])
 
-#CX of a circuit
+#CX Unitary of a circuit
 
 
 tensor = lambda *initial_state: reduce(lambda x, y: np.kron(x, y), initial_state)
-
-
 
 def cx_unitary(num_qubits, control, target):
     I = np.identity(2)
@@ -73,27 +73,12 @@ def get_operator(total_qubits, gate_unitary, target_qubits):
         while i < total_qubits-2:
             state = np.kron(state, I)
             i+=1   
-    else:
-        state = print("Adam is working on it")
+    if type(target_qubits) == list:
+        if gate_unitary.all() == np.array([[1,0,0,0], [0,1,0,0], [0,0,0,1], [0,0,1,0]]).all() or gate_unitary == [[1,0,0,0], [0,1,0,0], [0,0,0,1], [0,0,1,0]].all():
+            state = cx_unitary(total_qubits, target_qubits[0], target_qubits[1])
     return state
 
-from functools import reduce
-tensor = lambda *initial_state: reduce(lambda x, y: np.kron(x, y), initial_state)
-import numpy as np
-zero = np.array([[1],[0]])
-one = np.array([[0],[1]])
-I = np.identity(2)
-def cx_matrix(num_qubits, control, target):
 
-    left = [I]*num_qubits
-    right = [I]*num_qubits
-
-    left[control] = np.dot(zero, zero.T)
-    right[control] = np.dot(one, one.T)
-
-    right[target] = X
-
-    return tensor(*left) + tensor(*right)
 
 
 def run_program(initial_state, program):
