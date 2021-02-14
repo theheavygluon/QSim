@@ -1,2 +1,6 @@
 # QSim
-Basic Quantum Circuit Simulator for the QOSF Mentorship Assessment Task
+Kid: Mom can we get a qiskit?
+
+Mom: we already have a qiskit at home
+
+qiskit at home:
