@@ -1,15 +1,30 @@
 import numpy as np
-
+from functools import reduce
 # Matrices
 X = np.array([[0, 1], [1, 0]])
 Y = np.array([[0, -1j], [1j, 0]])
 Z = np.array([[1, 0], [0, -1]])
 H = 1/np.sqrt(2)*np.array([[1, 1], [1, -1]])
+zero = np.array([[1],[0]])
+one = np.array([[0],[1]])
 
+#CX of a circuit
+
+
+tensor = lambda *initial_state: reduce(lambda x, y: np.kron(x, y), initial_state)
+
+
+
+def cx_matrix(num_qubits, control, target):
+    I = np.identity(2)
+    left = [I]*num_qubits
+    right = [I]*num_qubits
+    left[control] = np.dot(zero, zero.T)
+    right[control] = np.dot(one, one.T)
+    right[target] = X
+    return tensor(*left) + tensor(*right)
 
 # Eigenvectors of Pauli Matrices
-zero = np.array([[1], [0]]) # Z plus basis state
-one = np.array([[0], [1]]) # Z plus basis state
 
 plus = np.array([[1], [1]])/np.sqrt(2) # X plus basis state
 minus = np.array([[1], [-1]])/np.sqrt(2) # X minus basis state
@@ -61,6 +76,24 @@ def get_operator(total_qubits, gate_unitary, target_qubits):
     else:
         state = print("Adam is working on it")
     return state
+
+from functools import reduce
+tensor = lambda *initial_state: reduce(lambda x, y: np.kron(x, y), initial_state)
+import numpy as np
+zero = np.array([[1],[0]])
+one = np.array([[0],[1]])
+I = np.identity(2)
+def cx_matrix(num_qubits, control, target):
+
+    left = [I]*num_qubits
+    right = [I]*num_qubits
+
+    left[control] = np.dot(zero, zero.T)
+    right[control] = np.dot(one, one.T)
+
+    right[target] = X
+
+    return tensor(*left) + tensor(*right)
 
 
 def run_program(initial_state, program):
