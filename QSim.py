@@ -15,7 +15,7 @@ tensor = lambda *initial_state: reduce(lambda x, y: np.kron(x, y), initial_state
 
 
 
-def cx_matrix(num_qubits, control, target):
+def cx_unitary(num_qubits, control, target):
     I = np.identity(2)
     left = [I]*num_qubits
     right = [I]*num_qubits
