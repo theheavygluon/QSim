@@ -1,9 +1,13 @@
 import numpy as np
 from functools import reduce
+import math 
+from sympy import Matrix, init_printing
+
 # Matrices
 X = np.array([[0, 1], [1, 0]])
 Y = np.array([[0, -1j], [1j, 0]])
 Z = np.array([[1, 0], [0, -1]])
+I = np.identity(2)
 H = 1/np.sqrt(2)*np.array([[1, 1], [1, -1]])
 CX = np.array([[1,0,0,0], [0,1,0,0], [0,0,0,1], [0,0,1,0]])
 CNOT = np.array([[1,0,0,0], [0,1,0,0], [0,0,0,1], [0,0,1,0]])
@@ -12,6 +16,8 @@ one = np.array([[0],[1]])
 
 #CX Unitary of a circuit
 
+def view(mat):
+    init_printing.display(Matrix(mat))
 
 tensor = lambda *initial_state: reduce(lambda x, y: np.kron(x, y), initial_state)
 
@@ -62,31 +68,32 @@ def get_ground_state(n):
 
 def get_operator(total_qubits, gate_unitary, target_qubits):
     if type(target_qubits) == int:
-        I = np.identity(total_qubits-1)
-        i = 0
-        state = I
-        while i < target_qubits-1:
-            state = np.kron(state, I)
-            i+=1
-        state = np.kron(state, gate_unitary)
-        
-        while i < total_qubits-2:
-            state = np.kron(state, I)
-            i+=1   
+        state = [I]*total_qubits
+        state[target_qubits] = gate_unitary
+        state = tensor(*state)
     if type(target_qubits) == list:
         if gate_unitary.all() == np.array([[1,0,0,0], [0,1,0,0], [0,0,0,1], [0,0,1,0]]).all() or gate_unitary == [[1,0,0,0], [0,1,0,0], [0,0,0,1], [0,0,1,0]].all():
             state = cx_unitary(total_qubits, target_qubits[0], target_qubits[1])
     return state
 
+def view_operator(total_qubits, gate_unitary, target_qubits):
+    if type(target_qubits) == int:
+        state = [I]*total_qubits
+        state[target_qubits] = gate_unitary
+        state = tensor(*state)
+    if type(target_qubits) == list:
+        if gate_unitary.all() == np.array([[1,0,0,0], [0,1,0,0], [0,0,0,1], [0,0,1,0]]).all() or gate_unitary == [[1,0,0,0], [0,1,0,0], [0,0,0,1], [0,0,1,0]].all():
+            state = cx_unitary(total_qubits, target_qubits[0], target_qubits[1])
+    return view(state)
 
 
-
-def run_program(initial_state, program):
-    # read program, and for each gate:
-    #   - calculate matrix operator
-    #   - multiply state with operator
-    # return final state
-    return
+def run_program(initial_state, circuit):
+    i = 0
+    state = np.array(initial_state)
+    while i< len(circuit):
+        state = np.dot(get_operator(int(math.log2(len(initial_state))), circuit[i]['gate'],circuit[i]['target']),state)
+        i+=1
+    return state
 
 def measure_all(state_vector):
     # choose element from state_vector using weighted random and return it's index
