@@ -2,6 +2,9 @@ import numpy as np
 from functools import reduce
 import math 
 from sympy import Matrix, init_printing
+import random
+from numpy.random import choice
+from collections import Counter
 
 # Matrices
 X = np.array([[0, 1], [1, 0]])
@@ -17,7 +20,11 @@ one = np.array([[0],[1]])
 #CX Unitary of a circuit
 
 def view(mat):
-    init_printing.display(Matrix(mat))
+    display(Matrix(mat))
+
+def decimalToBinary(n): 
+    return bin(n).replace("0b", "")
+
 
 tensor = lambda *initial_state: reduce(lambda x, y: np.kron(x, y), initial_state)
 
@@ -64,7 +71,7 @@ def get_ground_state(n):
 
 
 # return unitary operator of size 2**n x 2**n for given gate and target qubits
-#Problem: Trying to extend it to multiqubit targets (like CNOT)
+
 
 def get_operator(total_qubits, gate_unitary, target_qubits):
     if type(target_qubits) == int:
@@ -95,19 +102,20 @@ def run_program(initial_state, circuit):
         i+=1
     return state
 
-def measure_all(state_vector):
-    # choose element from state_vector using weighted random and return it's index
-    return
+
+    
+def measure(state_vector):
+    i = 0
+    
+    while i < len(state_vector):
+        print(str(decimalToBinary(i)) + ": " + str(round(state_vector[i]**2, 2)))
+        i+=1
+
 
 def get_counts(state_vector, num_shots):
-    # simply execute measure_all in a loop num_shots times and
-    # return object with statistics in following form:
-    #   {
-    #      element_index: number_of_ocurrences,
-    #      element_index: number_of_ocurrences,
-    #      element_index: number_of_ocurrences,
-    #      ...
-    #   }
-    # (only for elements which occoured - returned from measure_all)
-    return
-
+    size = [i for i in range(len(state_vector))]
+    weights = [i**2 for i in state_vector]
+    states = [str(decimalToBinary(i)) for i in size]
+    draw = choice(states, num_shots, p=weights)
+    result = [list(draw).count(i)/num_shots for i in states]
+    return result
